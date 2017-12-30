@@ -1,0 +1,64 @@
+function find0_9V
+%弹框获取文件名和地址
+[filename, pathname] = ...
+     uigetfile({'*.xlsx';'*.xls';'*.*'},'File Selector');
+%读取文件，注意fullfile
+M = xlsread(fullfile(pathname, filename));
+% [r c] = size(M);%r是行，c是列，行列尺寸；
+% R1 = M(2,:) %显示第一行
+x = M(:,1);
+y = M(:,5);
+% plot(x,y);
+hold on
+yy1 = smooth(y,30);
+plot(x,yy1); %绘制平滑后波形图
+xlabel('x');
+ylabel('intensity');
+% legend('原始曲线','平滑后波形');
+hold off
+% yy2 = smooth(y,30,'lowess'); %利用lowess方法y做平滑处理
+% plot(smooth(x,y))
+% false image
+% x = M(1:372,4);
+% y1 = M(1:372,5);
+% y2 = M(372:743,5);
+% y3 = M(743:1114,5);
+% y4 = M(1114:1485,5);
+% y5 = M(1485:1856,5);
+% y6 = M(1856:2227,5);
+% y7 = M(2227:2598,5);
+% y8 = M(2598:2969,5);
+% y9 = M(2969:3340,5);
+% y10 = M(3340:3711,5);
+% y11 = M(3711:4082,5);
+% y12 = M(4082:4453,5);
+% y13 = M(4453:4824,5);
+% y14 = M(4824:5195,5);
+% y15 = M(5195:5566,5);
+% y16 = M(5566:5937,5);
+% y17 = M(5937:6308,5);
+% y18 = M(6308:6679,5);
+% y19 = M(6679:7050,5);
+% y20 = M(7050:7421,5);
+% plot(smooth(x,y1))
+% hold on
+% plot(smooth(x,y2))
+% plot(smooth(x,y3))
+% plot(smooth(x,y4))
+% plot(smooth(x,y5))
+% plot(smooth(x,y6))
+% plot(smooth(x,y7))
+% plot(smooth(x,y8))
+% plot(smooth(x,y9))
+% plot(smooth(x,y10))
+% plot(smooth(x,y11))
+% plot(smooth(x,y12))
+% plot(smooth(x,y13))
+% plot(smooth(x,y14))
+% plot(smooth(x,y15))
+% plot(smooth(x,y16))
+% plot(smooth(x,y17))
+% plot(smooth(x,y18))
+% plot(smooth(x,y19))
+% plot(smooth(x,y20))
+% hold off
