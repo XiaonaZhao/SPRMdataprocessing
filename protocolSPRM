@@ -10,7 +10,7 @@ M = xlsread(fullfile(pathname, filename));
 prompt = {'Enter the sequence number for axis-X:',...
     'Enter the sequence number for axis-Y:'};
 name = 'Input for Y'' = dY/dX';
-% num_lines = 1;
+num_lines = 1;
 % num_lines 指定各用户输入值的行数。num_lines 可以为标量、列矢量或 m×2 数组。
 defaultanswer = {'1','2'};%如果没有输入
 % 接收X
