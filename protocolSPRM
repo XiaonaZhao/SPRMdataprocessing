@@ -9,42 +9,49 @@ M = xlsread(fullfile(pathname, filename));
 %-----弹框选择x&y-----
 prompt = {'Enter the sequence number for axis-X:',...
     'Enter the sequence number for axis-Y:'};
-name = 'Input for Y'' = dY/dX';
+dlg_title = 'Input for Y'' = dY/dX';
 num_lines = 1;
 % num_lines 指定各用户输入值的行数。num_lines 可以为标量、列矢量或 m×2 数组。
-defaultanswer = {'1','2'};%如果没有输入
-% 接收X
-X = inputdlg(prompt,name,num_lines,defaultanswer);
+defaultans = {'1','2'};%如果没有输入
 
-% options.Resize = 'on';
-% options.WindowStyle = 'normal';
-% options.Interpreter = 'tex';
-% answer2 = inputdlg(prompt,name,numlines,defaultanswer,options);
-
-% 接收Y
-Y = inputdlg(prompt,name,numlines,defaultanswer);
+answer = inputdlg(prompt,dlg_title,num_lines,defaultans);% 接收X
+X = str2num(answer{1}); 
+Y = str2num(answer{2}); 
+% % Use curly bracket for subscript
+% [val status] = str2num(answer{1});  
+% if ~status
+%     % Handle empty value returned 
+%     % for unsuccessful conversion
+%     % ...
+% end
+% % val is a scalar or matrix converted from the first input
+% % str2num 不对字符串数组或元胞数组执行运算。要将字符串数组或字符矢量元胞数组转换为数值，请使用 str2double。
 
 %-----传参与计算-----
 x = M(:,X);
 y = M(:,Y);
-yy1 = smooth(y,30); % 平滑y数据
-y2 = diff(y)./diff(x); % 求导
+
 % -----激活左侧坐标轴-----
 yyaxis left
 % x = M(:,1);
 % y = M(:,5);
 % plot(x,y); % 绘制x-y关系图
 hold on
+yy1 = smooth(y,30); % 平滑y数据
 plot(x,yy1); % 绘制平滑后波形图
 
 % -----左侧绘制图例等-----
 xlabel('x');
 ylabel('intensity');
-% legend('原始曲线','平滑后波形');
 
 % -----激活右侧坐标轴-----
 yyaxis right
-plot(x,y2);
+% y2 = diff(y)./diff(x); % 求导原始数据y
+% yy2 = smooth(y2,30); % 平滑y2数据
+yy2 = diff(yy1)./diff(x); % 求导平滑数据yy1
+yyy2 = smooth(yy2,30); % 平滑yy2数据
+plot(x(2:end,1),yyy2);
 % -----左侧绘制图例等-----
 ylabel('The differential derivative'); 
+% legend('原始曲线','平滑后波形');
 hold off
