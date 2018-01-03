@@ -1,25 +1,50 @@
 function protocolSPRM
-%弹框获取文件名和地址
+% 弹框获取文件名和地址
 [filename, pathname] = ...
      uigetfile({'*.xlsx';'*.xls';'*.*'},'File Selector');
-%读取文件，注意fullfile
+% 读取文件，注意fullfile
 M = xlsread(fullfile(pathname, filename));
-% [r c] = size(M);%r是行，c是列，行列尺寸；
-R1 = M(1,:); %显示第一行
-% [r1, c1] = size(R1); %第一行的列数
-N = M(:,2);
-x = N(1,:);
-y = N(5,:);
-yy = smooth(y,30);
-plot(x,yy); %绘制平滑后波形图
-% for i = 5:5:c1
-%     x = N(:,i-4);
-%     y = N(:,i);
-%     yy = smooth(y,30);
-%     plot(x,yy); %绘制平滑后波形图
-%     legend(sprintf('%s',fix(i/5))); %图例
-%     hold on
-% end
-xlabel('x'); %横坐标
-ylabel('intensity'); %纵坐标
+% [r c] = size(M); % r是行，c是列，行列尺寸；
+% R1 = M(2,:) % 显示第一行
+%-----弹框选择x&y-----
+prompt = {'Enter the sequence number for axis-X:',...
+    'Enter the sequence number for axis-Y:'};
+name = 'Input for Y'' = dY/dX';
+% num_lines = 1;
+% num_lines 指定各用户输入值的行数。num_lines 可以为标量、列矢量或 m×2 数组。
+defaultanswer = {'1','2'};%如果没有输入
+% 接收X
+X = inputdlg(prompt,name,num_lines,defaultanswer);
+
+% options.Resize = 'on';
+% options.WindowStyle = 'normal';
+% options.Interpreter = 'tex';
+% answer2 = inputdlg(prompt,name,numlines,defaultanswer,options);
+
+% 接收Y
+Y = inputdlg(prompt,name,numlines,defaultanswer);
+
+%-----传参与计算-----
+x = M(:,X);
+y = M(:,Y);
+yy1 = smooth(y,30); % 平滑y数据
+y2 = diff(y)./diff(x); % 求导
+% -----激活左侧坐标轴-----
+yyaxis left
+% x = M(:,1);
+% y = M(:,5);
+% plot(x,y); % 绘制x-y关系图
+hold on
+plot(x,yy1); % 绘制平滑后波形图
+
+% -----左侧绘制图例等-----
+xlabel('x');
+ylabel('intensity');
+% legend('原始曲线','平滑后波形');
+
+% -----激活右侧坐标轴-----
+yyaxis right
+plot(x,y2);
+% -----左侧绘制图例等-----
+ylabel('The differential derivative'); 
 hold off
