@@ -1,17 +1,24 @@
+% -----Information-----
+% a try named 'find0_9V.m',...
+% Used to draw figures of smoothed data from SPRM, like (Frame, Intensity).
+% Need Users change paraments manually.
+% Author: S201346044@mail.dlut.edu.cn;
+% License: http://www.apache.org/licenses/;
+
 function find0_9V
-%弹框获取文件名和地址
+% Get filename & location with a box.
 [filename, pathname] = ...
      uigetfile({'*.xlsx';'*.xls';'*.*'},'File Selector');
-%读取文件，注意fullfile
+% Read an Excel file. Attention: Mind the 'fullfile' function.
 M = xlsread(fullfile(pathname, filename));
-% [r c] = size(M);%r是行，c是列，行列尺寸；
-% R1 = M(2,:) %显示第一行
-x = M(:,1);
-y = M(:,5);
+% [r c] = size(M);% r, row; c, column.
+% R1 = M(2,:) % Display the first ROW
+x = M(:,1); % Select x
+y = M(:,7); % Select y
 % plot(x,y);
 hold on
-yy1 = smooth(y,30);
-plot(x,yy1); %绘制平滑后波形图
+yy1 = smooth(y,20);% Mind the SPAN in smoothing
+plot(x,yy1); % Draw the figure with y smoothed
 xlabel('x');
 ylabel('intensity');
 % legend('原始曲线','平滑后波形');
