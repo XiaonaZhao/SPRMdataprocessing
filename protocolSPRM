@@ -1,3 +1,9 @@
+% -----Information-----
+% For the sake of 'find0_9V.m',...
+% Used to draw figures of (voltage,dY/dX) from SPRM.
+% Author: S201346044@mail.dlut.edu.cn;
+% License: http://www.apache.org/licenses/;
+
 function protocolSPRM
 % 弹框获取文件名和地址
 [filename, pathname] = ...
@@ -8,11 +14,13 @@ M = xlsread(fullfile(pathname, filename));
 % R1 = M(2,:) % 显示第一行
 %-----弹框选择x&y-----
 prompt = {'Enter the sequence number for axis-X:',...
-    'Enter the sequence number for axis-Y:'};
-dlg_title = 'Input for Y'' = dY/dX';
+    'Enter the sequence number for axis-Y:',...
+    'Enter the label for axis-X'};
+dlg_title = 'Input';
 num_lines = 1;
 % num_lines 指定各用户输入值的行数。num_lines 可以为标量、列矢量或 m×2 数组。
-defaultans = {'1','2'};%如果没有输入
+defaultans = {'1','2','x'};%如果没有输入
+% 'x'指横坐标
 
 answer = inputdlg(prompt,dlg_title,num_lines,defaultans);% 接收X
 X = str2num(answer{1}); 
@@ -41,7 +49,7 @@ yy1 = smooth(y,30); % 平滑y数据
 plot(x,yy1); % 绘制平滑后波形图
 
 % -----左侧绘制图例等-----
-xlabel('x');
+xlabel(answer{3});
 ylabel('intensity');
 
 % -----激活右侧坐标轴-----
