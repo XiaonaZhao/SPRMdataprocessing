@@ -1,0 +1,7 @@
+function findLow_HighVoltage
+
+
+extrMaxValue = y(find(diff(sign(diff(y)))==-2)+1); % find Maxima
+extrMaxIndex = find(diff(sign(diff(y)))==-2)+1; % find the locatiion of Maxima
+extrMinValue = y(find(diff(sign(diff(y)))==+2)+1); % find Minima
+extrMinIndex = find(diff(sign(diff(y)))==+2)+1; % find the locatiion of Minima
