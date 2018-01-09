@@ -1,3 +1,5 @@
+% Untested m file
+
 function CoreTest
 [filename, pathname] = ...
      uigetfile({'*.xlsx';'*.xls';'*.*'},'File Selector');
