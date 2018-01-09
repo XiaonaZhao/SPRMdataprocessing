@@ -1,0 +1,52 @@
+function CoreTest
+[filename, pathname] = ...
+     uigetfile({'*.xlsx';'*.xls';'*.*'},'File Selector');
+%读取文件，注意fullfile
+M = xlsread(fullfile(pathname, filename));
+
+%% -----findLow_HighVoltage-----
+
+y = M(:,1);
+yy1 = smooth(y,30); % 平滑y数据
+[pksH,locsH] = findpeaks(yy1); % 获取M第1列的极大值以及其位置
+[pksL,locsL] = findpeaks((-1)*yy1); % 获取M第1列的极小值*-1以及其位置
+pksL = -1*pksL;  % 获取M第1列的极小值以及其位置
+% ---修改矩阵信息---
+[r,c] = size(M); % 求矩阵行列信息
+N = zero(1,c); % 产生一维零矩阵制造存放空间
+if locsH(1) < locs(1)
+    for i = 1:length(pksH)
+        N(1,locsH(i)) = 0.9; % 矩阵中特定位置的值
+        N(1,locsL(i)) = 0.2; % 矩阵中特定位置的值
+        % ---Sequence插值(0.9 V - 0.2 V)---
+        d = (0.9-0.2)/(locsL(i)-locsH(i));
+        for j = 1:(locsL(i)-locsH(i)-1)
+            N(1,locsH(i)+j) = 0.9-j*d;
+        end
+    end
+    % ---Sequence插值(0.2 V - 0.9 V)---
+    for i = 1:length(pksL)-1
+        d = (0.9-0.2)/(locsH(i+1)-locsL(i));
+        N(1,locsL(i)+i) = 0.2+i*d;
+    end
+else
+    N(1,locsL(1)) = 0.2; % 矩阵中0.2比0.9多一个
+    for i = 1:length(pksH)
+        N(1,locsH(i)) = 0.9; % 矩阵中特定位置的值
+        N(1,locsL(i+1)) = 0.2; % 矩阵中特定位置的值
+        % ---Sequence插值(0.9 V - 0.2 V)---
+        d = (0.9-0.2)/(locsL(i+1)-locsH(i));
+        for j = 1:(locsL(i+1)-locsH(i)-1)
+            N(1,locsH(i)+j) = 0.9-j*d;
+        end
+    end
+    % ---Sequence插值(0.2 V - 0.9 V)---
+    for i = 1:length(pksL)-1
+        d = (0.9-0.2)/(locsH(i)-locsL(i));
+        N(1,locsL(i)+i) = 0.2+i*d;
+    end
+end
+M = M'; % 转置矩阵
+M = [M; N]'; % 回归原来的矩阵，比之前多一行
+% ---下一步应该如何传参，所以不应该一个一个往下粘了，还是应该采取外部传参的方法
+%
