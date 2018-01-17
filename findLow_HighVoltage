@@ -2,76 +2,119 @@
 % Author: S201346044@mail.dlut.edu.cn;
 % License: http://www.apache.org/licenses/;
 
-function findLow_HighVoltage
-[filename, pathname] = ...
-     uigetfile({'*.xlsx';'*.xls';'*.*'},'File Selector');
-[status,sheet] = xlsfinfo(fullfile(pathname, filename));
-for i = 1:length(sheet) % 读取不同工作表的内容
-    sheet_n = sheet{i};
-    % 读取文件，注意fullfile
-    M = xlsread(fullfile(pathname, filename),sheet_n);
-    % [r c] = size(M); % r是行，c是列，行列尺寸；
-    % R1 = M(2,:) % 显示第一行
-    %-----弹框选择x&y-----
-    prompt = {'Enter the sequence number for axis-X:',...
-        'Enter the sequence number for axis-Y:',...
-        'Select the span of SMOOTH',...
-        'Enter the label for axis-X'};
-    dlg_title = 'Input';
-    num_lines = 1;
-    % num_lines 指定各用户输入值的行数。num_lines 可以为标量、列矢量或 m×2 数组。
-    defaultans = {'1','2','30','Voltage /V'};%如果没有输入
-    % 'SPAN'指平滑的跨度
-    % 'Voltage /V'指横坐标
-    
-    answer = inputdlg(prompt,dlg_title,num_lines,defaultans);% 接收X
-    X = str2num(answer{1}); % 这里的str2num没有问题，放心用
-    Y = str2num(answer{2});
-    % % Use curly bracket for subscript
-    % [val status] = str2num(answer{1});
-    % if ~status
-    %     % Handle empty value returned
-    %     % for unsuccessful conversion
-    %     % ...
-    % end
-    % % val is a scalar or matrix converted from the first input
-    % % str2num 不对字符串数组或元胞数组执行运算。要将字符串数组或字符矢量元胞数组转换为数值，请使用 str2double。
-    
-    %-----传参与计算-----
-    x = M(:,X);
-    for j = Y(1):Y(length(Y))
-        y = M(:,j);
-        yy1 = smooth(y,30); % 平滑y数据
-        % y2 = diff(y)./diff(x); % 求导原始数据y
-        % yy2 = smooth(y2,30); % 平滑y2数据
-        yy2 = diff(yy1)./diff(x); % 求导平滑数据yy1，求导后少一个
-        yyy2 = smooth(yy2,30); % 平滑yy2数据
-        extrMaxValue = y(find(diff(sign(diff(yyy2)))==-2)+1); % find Maxima
-        
-        % -----激活左侧坐标轴-----
-        yyaxis left
-        plot(x,yy1); % 绘制平滑后波形图
-        ylabel('intensity'); % 加左坐标轴标题
-        
-        % -----激活右侧坐标轴-----
-        yyaxis right
-        plot(x(2:end,1),yyy2);% 求导后少一个y
-        ylabel('The differential derivative'); % 加右坐标轴标题
-        
-        % -----通用坐标轴信息添加-----
-        xlabel(answer{3}); % 横坐标标题
-        legend('平滑后原始曲线','求导平滑后波形'); % 图例
-        hold off
-%         filename=['test' num2str(i) '.tiff'];
-%         saveas(h,filename)
-%         close(gcf)
-        % -----结束该工作表的图表绘制，同时保持工作表存在-----
+% function findLow_HighVoltage
+% [filename, pathname] = ...
+%      uigetfile({'*.xlsx';'*.xls';'*.*'},'File Selector');
+% [status,sheet] = xlsfinfo(fullfile(pathname, filename));
+% for i = 1:length(sheet) % 读取不同工作表的内容
+%     sheet_n = sheet{i};
+%     % 读取文件，注意fullfile
+%     M = xlsread(fullfile(pathname, filename),sheet_n);
+%     % [r c] = size(M); % r是行，c是列，行列尺寸；
+%     % R1 = M(2,:) % 显示第一行
+%     %-----弹框选择x&y-----
+%     prompt = {'Enter the sequence number for axis-X:',...
+%         'Enter the sequence number for axis-Y:',...
+%         'Select the span of SMOOTH',...
+%         'Enter the label for axis-X'};
+%     dlg_title = 'Input';
+%     num_lines = 1;
+%     % num_lines 指定各用户输入值的行数。num_lines 可以为标量、列矢量或 m×2 数组。
+%     defaultans = {'1','2','30','Voltage /V'};%如果没有输入
+%     % 'SPAN'指平滑的跨度
+%     % 'Voltage /V'指横坐标
+%     
+%     answer = inputdlg(prompt,dlg_title,num_lines,defaultans);% 接收X
+%     X = str2num(answer{1}); % 这里的str2num没有问题，放心用
+%     Y = str2num(answer{2});
+%     % % Use curly bracket for subscript
+%     % [val status] = str2num(answer{1});
+%     % if ~status
+%     %     % Handle empty value returned
+%     %     % for unsuccessful conversion
+%     %     % ...
+%     % end
+%     % % val is a scalar or matrix converted from the first input
+%     % % str2num 不对字符串数组或元胞数组执行运算。要将字符串数组或字符矢量元胞数组转换为数值，请使用 str2double。
+%     
+%     %-----传参与计算-----
+%     x = M(:,X);
+%     for j = Y(1):Y(length(Y))
+%         y = M(:,j);
+%         yy1 = smooth(y,30); % 平滑y数据
+%         % y2 = diff(y)./diff(x); % 求导原始数据y
+%         % yy2 = smooth(y2,30); % 平滑y2数据
+%         yy2 = diff(yy1)./diff(x); % 求导平滑数据yy1，求导后少一个
+%         yyy2 = smooth(yy2,30); % 平滑yy2数据
+%         extrMaxValue = y(find(diff(sign(diff(yyy2)))==-2)+1); % find Maxima
+%         
+%         % -----激活左侧坐标轴-----
+%         yyaxis left
+%         plot(x,yy1); % 绘制平滑后波形图
+%         ylabel('intensity'); % 加左坐标轴标题
+%         
+%         % -----激活右侧坐标轴-----
+%         yyaxis right
+%         plot(x(2:end,1),yyy2);% 求导后少一个y
+%         ylabel('The differential derivative'); % 加右坐标轴标题
+%         
+%         % -----通用坐标轴信息添加-----
+%         xlabel(answer{3}); % 横坐标标题
+%         legend('平滑后原始曲线','求导平滑后波形'); % 图例
+%         hold off
+% %         filename=['test' num2str(i) '.tiff'];
+% %         saveas(h,filename)
+% %         close(gcf)
+%         % -----结束该工作表的图表绘制，同时保持工作表存在-----
+%     end
+%     
+%     
+% % 
+% % extrMaxValue = y(find(diff(sign(diff(y)))==-2)+1); % find Maxima
+% % extrMaxIndex = find(diff(sign(diff(y)))==-2)+1; % find the locatiion of Maxima
+% % extrMinValue = y(find(diff(sign(diff(y)))==+2)+1); % find Minima
+% % extrMinIndex = find(diff(sign(diff(y)))==+2)+1; % find the locatiion of Minima
+% end
+function [MM] = findLow_HighVoltage(M)
+y = M(:,1);
+yy1 = smooth(y,30); % 平滑y数据
+[pksH,locsH] = findpeaks(yy1); % 获取M第1列的极大值以及其位置
+[pksL,locsL] = findpeaks((-1)*yy1); % 获取M第1列的极小值*-1以及其位置
+pksL = -1*pksL;  % 获取M第1列的极小值以及其位置
+% ---修改矩阵信息---
+[r,c] = size(M); % 求矩阵行列信息
+N = zeros(1,c); % 产生一维零矩阵制造存放空间
+if locsH(1) < locsL(1)
+    for i = 1:length(pksH)
+        N(1,locsH(i)) = 0.9; % 矩阵中特定位置的值
+        N(1,locsL(i)) = 0.2; % 矩阵中特定位置的值
+        % ---Sequence插值(0.9 V - 0.2 V)---
+        d = (0.9-0.2)/(locsL(i)-locsH(i));
+        for j = 1:(locsL(i)-locsH(i)-1)
+            N(1,locsH(i)+j) = 0.9-j*d;
+        end
     end
-    
-    
-% 
-% extrMaxValue = y(find(diff(sign(diff(y)))==-2)+1); % find Maxima
-% extrMaxIndex = find(diff(sign(diff(y)))==-2)+1; % find the locatiion of Maxima
-% extrMinValue = y(find(diff(sign(diff(y)))==+2)+1); % find Minima
-% extrMinIndex = find(diff(sign(diff(y)))==+2)+1; % find the locatiion of Minima
+    % ---Sequence插值(0.2 V - 0.9 V)---
+    for i = 1:length(pksL)-1
+        d = (0.9-0.2)/(locsH(i+1)-locsL(i));
+        N(1,locsL(i)+i) = 0.2+i*d;
+    end
+else
+    N(1,locsL(1)) = 0.2; % 矩阵中0.2比0.9多一个
+    for i = 1:length(pksH)
+        N(1,locsH(i)) = 0.9; % 矩阵中特定位置的值
+        N(1,locsL(i+1)) = 0.2; % 矩阵中特定位置的值
+        % ---Sequence插值(0.9 V - 0.2 V)---
+        d = (0.9-0.2)/(locsL(i+1)-locsH(i));
+        for j = 1:(locsL(i+1)-locsH(i)-1)
+            N(1,locsH(i)+j) = 0.9-j*d;
+        end
+    end
+    % ---Sequence插值(0.2 V - 0.9 V)---
+    for i = 1:length(pksL)-1
+        d = (0.9-0.2)/(locsH(i)-locsL(i));
+        N(1,locsL(i)+i) = 0.2+i*d;
+    end
 end
+M = M'; % 转置矩阵
+MM = [M; N]'; % 回归原来的矩阵，比之前多一行
