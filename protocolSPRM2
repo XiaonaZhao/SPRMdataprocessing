@@ -12,7 +12,7 @@ function protocolSPRM
 for i = 1:length(sheet) % 读取不同工作表的内容
     sheet_n = sheet{i};
     % 读取文件，注意fullfile
-    M = xlsread(fullfile(pathname, filename),sheet_n);
+    N = xlsread(fullfile(pathname, filename),sheet_n);
     % [r c] = size(M); % r是行，c是列，行列尺寸；
     % R1 = M(2,:) % 显示第一行
     %-----弹框选择x&y-----
@@ -38,6 +38,7 @@ for i = 1:length(sheet) % 读取不同工作表的内容
     % % val is a scalar or matrix converted from the first input
     % % str2num 不对字符串数组或元胞数组执行运算。要将字符串数组或字符矢量元胞数组转换为数值，请使用 str2double。
     
+    M = findLow_HighVoltage(N);
     %-----传参与计算-----
     x = M(:,X);
     for j = Y(1):Y(length(Y))
