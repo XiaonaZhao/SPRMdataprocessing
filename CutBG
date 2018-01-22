@@ -1,0 +1,26 @@
+function [NN] = CutBG(N)
+prompt = {'Enter the sequence number for BG:',...
+    'Enter the sequence number for NPs:'};
+dlg_title = 'Input';
+num_lines = 1;
+% num_lines 指定各用户输入值的行数。num_lines 可以为标量、列矢量或 m×2 数组。
+defaultans = {'1','2'};%如果没有输入
+
+answer = inputdlg(prompt,dlg_title,num_lines,defaultans);% 接收X
+X = str2num(answer{1}); % 这里的str2num没有问题，放心用
+Y = str2num(answer{2});
+% X是BG的列，Y是颗粒强度列
+
+BG = N(:,X); % 提取背景intensity
+n = length(BG); % 一共采了多少个点
+NN = zeros(n,length(Y)+1); % 设置空矩阵
+
+x = 1;
+for i = Y(1):(Y(1)+length(Y)-1)
+    NP = N(:,i); % 
+    NP = NP - BG;
+    NN(:,x) = NP;
+    x = x+1;
+end
+NN(:,x) = N(:,X); % 将BG传入NN最后一列
+clear x
