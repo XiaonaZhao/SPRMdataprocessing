@@ -1,0 +1,24 @@
+function SelectReadFile
+% =====Open file selection dialog box=====
+[filename, pathname] = ...
+    uigetfile({'*.xlsx';'*.xls';'*.*'},'File Selector');
+[~,sheet] = xlsfinfo(fullfile(pathname, filename));
+% ===== =====
+prompt = {'Enter the armed SHEET:'};
+%     'Enter the sequence number as X:',...
+%     'Enter the sequence number as Y:',...
+%     'Enter the label for X:',...
+%     'Enter the label for Y:'};
+dlg_title = 'Input';
+num_lines = 1;
+% defaultans = {'1','2','3','NO'};
+defaultans = {'1'};
+answer = inputdlg(prompt,dlg_title,num_lines,defaultans);
+sheet_n = sheet{str2num(answer{1})}; % Select a sheet
+% X = str2num(answer{2}); % 钦定一个自变量
+% Y = str2num(answer{3}); % 指派一群因变量
+% 这里的str2num没有问题，放心用
+N = xlsread(fullfile(pathname, filename),sheet_n); % 圈定需要处理的表单
+
+% =====下面想套什么函数加什么函数=====
+NN = CutBG(N); % 利用CutBG得到减去背景的纯Intensity
