@@ -18,7 +18,7 @@ NN = zeros(n,length(Y)+1); % 设置空矩阵
 x = 1;
 for i = Y(1):(Y(1)+length(Y)-1)
     NP = N(:,i); % 
-    NP = NP - BG;
+    NP(2:end) = NP(2:end) - BG(2:end); % 除了第一行
     NN(:,x) = NP;
     x = x+1;
 end
