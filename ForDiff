@@ -1,0 +1,83 @@
+% -----Information-----
+% For the sake of 'protocolSPRM.m',...
+% 绘制单一(frame,intensity)的求导图
+% Used to draw figures of (voltage,dY/dX) from SPRM.
+% Author: S201346044@mail.dlut.edu.cn;
+% License: http://www.apache.org/licenses/;
+
+function ForDiff
+% 弹框获取文件名和地址
+[filename, pathname] = ...
+     uigetfile({'*.xlsx';'*.xls';'*.*'},'File Selector');
+[~,sheet] = xlsfinfo(fullfile(pathname, filename));
+% for i = 1:length(sheet) % 读取不同工作表的内容
+%     sheet_n = sheet{i};
+    % 读取文件，注意fullfile
+
+    % [r c] = size(M); % r是行，c是列，行列尺寸；
+    % R1 = M(2,:) % 显示第一行
+    %-----弹框选择x&y-----
+    prompt = {'Select ONE sheet:',...
+        'Enter the sequence number for axis-X:',...
+        'Enter the sequence number for axis-Y:',...
+        'Enter the label for axis-X'};
+%     dlg_title = 'Input';
+    dlg_title = 'Input';
+    num_lines = 1;
+    % num_lines 指定各用户输入值的行数。num_lines 可以为标量、列矢量或 m×2 数组。
+    defaultans = {'1','1','2','Voltage /V'};%如果没有输入
+    % 'Voltage /V'指横坐标
+    
+    answer = inputdlg(prompt,dlg_title,num_lines,defaultans);% 接收X
+    n = str2num(answer{1});
+    X = str2num(answer{2}); % 这里的str2num没有问题，放心用
+    Y = str2num(answer{3});
+    % % Use curly bracket for subscript
+    % [val status] = str2num(answer{1});
+    % if ~status
+    %     % Handle empty value returned
+    %     % for unsuccessful conversion
+    %     % ...
+    % end
+    % % val is a scalar or matrix converted from the first input
+    % % str2num 不对字符串数组或元胞数组执行运算。要将字符串数组或字符矢量元胞数组转换为数值，请使用 str2double。
+    
+%     M = findLow_HighVoltage(N);
+    %-----传参与计算-----
+    N = xlsread(fullfile(pathname, filename),sheet{n});
+    x = N(:,X);
+    for jY = Y(1):Y(length(Y))
+        figure % 作图
+        % figure('visible','off') % 不显示图像
+        hold on
+        y = N(:,jY);
+        % x = M(:,1);
+        % y = M(:,5);
+        % plot(x,y); % 绘制x-y关系图
+%         yy1 = smooth(y,30); % 平滑y数据
+        y2 = diff(y)./diff(x); % 求导原始数据y
+        yy2 = smooth(y2,30);
+        % yy2 = smooth(y2,30); % 平滑y2数据
+%         yy2 = diff(yy1)./diff(x); % 求导平滑数据yy1
+%         yyy2 = smooth(yy2,30); % 平滑yy2数据
+        
+%         % -----激活左侧坐标轴-----
+%         yyaxis left
+%         plot(x,yy1); % 绘制平滑后波形图
+%         ylabel('intensity'); % 加左坐标轴标题
+        
+        % -----激活右侧坐标轴-----
+%         yyaxis right
+        plot(x(2:end,1),yy2);
+        ylabel('The differential derivative'); % 加右坐标轴标题
+        
+        % -----通用坐标轴信息添加-----
+        xlabel(answer{4}); % 横坐标标题
+%         legend('平滑后原始曲线','求导平滑后波形'); % 图例
+        hold off
+%         filename=['test' num2str(i) '.tiff'];
+%         saveas(h,filename)
+%         close(gcf)
+        % -----结束该工作表的图表绘制，同时保持工作表存在-----
+    end
+% end
