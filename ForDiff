@@ -41,13 +41,19 @@ function ForDiff
     % end
     % % val is a scalar or matrix converted from the first input
     % % str2num 不对字符串数组或元胞数组执行运算。要将字符串数组或字符矢量元胞数组转换为数值，请使用 str2double。
+   
+    if ~exist('Figure')
+        mkdir('Figure')         % 若不存在，在当前目录中产生一个子目录‘Figure’
+    end
+    INpath = 'Figure'; % 保存到当前文件夹
     
 %     M = findLow_HighVoltage(N);
-    %-----传参与计算-----
+    % -----传参与计算-----
     N = xlsread(fullfile(pathname, filename),sheet{n});
     x = N(:,X);
+    iCount = 1; % 计数观察计算到达哪一步
     for jY = Y(1):Y(length(Y))
-        figure % 作图
+        f = figure; % 作图
         % figure('visible','off') % 不显示图像
         hold on
         y = N(:,jY);
@@ -62,7 +68,7 @@ function ForDiff
 %         yy2 = diff(yy1)./diff(x); % 求导平滑数据yy1
 %         yyy2 = smooth(yy2,30); % 平滑yy2数据
         
-%         % -----激活左侧坐标轴-----
+%       % -----激活左侧坐标轴-----
 %         yyaxis left
 %         plot(x,yy1); % 绘制平滑后波形图
 %         ylabel('intensity'); % 加左坐标轴标题
@@ -76,9 +82,15 @@ function ForDiff
         xlabel(answer{4}); % 横坐标标题
 %         legend('平滑后原始曲线','求导平滑后波形'); % 图例
         hold off
-%         filename=['test' num2str(i) '.tiff'];
-%         saveas(h,filename)
-%         close(gcf)
-        % -----结束该工作表的图表绘制，同时保持工作表存在-----
+        
+        % -----结束该工作表的图表绘制，同时保持工作表存在-----        
+        INfilename = ['C' num2str(n) 'NP' num2str(iCount) '.fig'];
+        % 根据需求设置文件名
+        SavePath = fullfile(INpath, INfilename);
+        saveas(f,SavePath);
+        close(gcf)
+        iCount = iCount +1; % 进入下一个循环前加1
+
     end
+    clear iCount
 % end
