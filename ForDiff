@@ -54,9 +54,10 @@ function ForDiff
         % x = M(:,1);
         % y = M(:,5);
         % plot(x,y); % 绘制x-y关系图
-%         yy1 = smooth(y,30); % 平滑y数据
-        y2 = diff(y)./diff(x); % 求导原始数据y
-        yy2 = smooth(y2,30);
+        y1 = smooth(y,50); % 平滑y数据
+        yy1 = diff(y1)./diff(x); % 求导原始数据y
+        y2 = smooth(yy1,50);
+        yy2 = y2(2:length(y2)-1,1);
         % yy2 = smooth(y2,30); % 平滑y2数据
 %         yy2 = diff(yy1)./diff(x); % 求导平滑数据yy1
 %         yyy2 = smooth(yy2,30); % 平滑yy2数据
@@ -68,7 +69,7 @@ function ForDiff
         
         % -----激活右侧坐标轴-----
 %         yyaxis right
-        plot(x(2:end,1),yy2);
+        plot(x(1:length(yy2),1),yy2);
         ylabel('The differential derivative'); % 加右坐标轴标题
         
         % -----通用坐标轴信息添加-----
