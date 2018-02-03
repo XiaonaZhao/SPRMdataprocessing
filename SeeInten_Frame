@@ -5,29 +5,37 @@
 % License: http://www.apache.org/licenses/;
 
 function SeeInten_Frame
-%弹框获取文件名和地址
+% 弹框获取文件名和地址
 [filename, pathname] = ...
      uigetfile({'*.xlsx';'*.xls';'*.*'},'File Selector');
-%读取文件，注意fullfile
-M = xlsread(fullfile(pathname, filename));
+[~,sheet] = xlsfinfo(fullfile(pathname, filename));
+% for i = 1:length(sheet) % 读取不同工作表的内容
+%     sheet_n = sheet{i};
+    % 读取文件，注意fullfile
 
-%-----弹框选择x&y-----
-prompt = {'Enter the sequence number for axis-X:',...
-    'Enter the sequence number for axis-Y:',...
-    'Select the span of SMOOTH'};
-dlg_title = 'Input';
-num_lines = 1;
-% num_lines 指定各用户输入值的行数。num_lines 可以为标量、列矢量或 m×2 数组。
-defaultans = {'1','2','30'};% 如果没有输入
-% 'SPAN'指平滑的跨度
-answer = inputdlg(prompt,dlg_title,num_lines,defaultans);% 接收X
-X = str2num(answer{1}); 
-Y = str2num(answer{2}); % 选取变量列
-SPAN = str2num(answer{3});
+    % [r c] = size(M); % r是行，c是列，行列尺寸；
+    % R1 = M(2,:) % 显示第一行
+    %-----弹框选择x&y-----
+    prompt = {'Select ONE sheet:',...
+        'Enter the sequence number for axis-X:',...
+        'Enter the sequence number for axis-Y:',...
+        'Enter the span of smoothing'};
+%     dlg_title = 'Input';
+    dlg_title = 'Input';
+    num_lines = 1;
+    % num_lines 指定各用户输入值的行数。num_lines 可以为标量、列矢量或 m×2 数组。
+    defaultans = {'1','1','2','30'};%如果没有输入
+    % 'Voltage /V'指横坐标
+    
+    answer = inputdlg(prompt,dlg_title,num_lines,defaultans);% 接收X
+    n = str2num(answer{1});
+    X = str2num(answer{2}); % 这里的str2num没有问题，放心用
+    Y = str2num(answer{3});
+    SPAN = str2num(answer{4});
 % % Use curly bracket for subscript
-% [val status] = str2num(answer{1});  
+% [val status] = str2num(answer{1});
 % if ~status
-%     % Handle empty value returned 
+%     % Handle empty value returned
 %     % for unsuccessful conversion
 %     % ...
 % end
@@ -35,6 +43,7 @@ SPAN = str2num(answer{3});
 % % str2num 不对字符串数组或元胞数组执行运算。要将字符串数组或字符矢量元胞数组转换为数值，请使用 str2double。
 
 % -----传参-----
+M = xlsread(fullfile(pathname, filename),sheet{n});
 x = M(:,X);
 y = M(:,Y);
 % plot(x,y);
