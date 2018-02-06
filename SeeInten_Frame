@@ -45,17 +45,20 @@ SPAN = str2num(answer{4});
 % -----传参-----
 M = xlsread(fullfile(pathname, filename),sheet{n});
 x = M(:,X);
-iCount = 1; % 计数观察计算到达哪一步
+% iCount = 1; % 计数观察计算到达哪一步
+mylgd = cell(1,length(Y));
 for jY = 1:length(Y)
     y = M(:,Y(jY));
     yy1 = smooth(y,SPAN);%注意平滑程度
     plot(x,yy1); %绘制平滑后波形图
     hold on
-%     legend(num2str(iCount));
+    mylgd{jY} = ['NP', num2str(jY)];
+%     legend(f,num2str(iCount));
 %     iCount = iCount + 1;
 end
 clear iCount
+legend(mylgd);
 xlabel('Frame');
-ylabel('Intensity');
-legend(answer{3});
+ylabel('d(Intensity)');
+% legend(answer{3});
 hold off
