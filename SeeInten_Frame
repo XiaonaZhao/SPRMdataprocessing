@@ -7,31 +7,31 @@
 function SeeInten_Frame
 % 弹框获取文件名和地址
 [filename, pathname] = ...
-     uigetfile({'*.xlsx';'*.xls';'*.*'},'File Selector');
+    uigetfile({'*.xlsx';'*.xls';'*.*'},'File Selector');
 [~,sheet] = xlsfinfo(fullfile(pathname, filename));
 % for i = 1:length(sheet) % 读取不同工作表的内容
 %     sheet_n = sheet{i};
-    % 读取文件，注意fullfile
+% 读取文件，注意fullfile
 
-    % [r c] = size(M); % r是行，c是列，行列尺寸；
-    % R1 = M(2,:) % 显示第一行
-    %-----弹框选择x&y-----
-    prompt = {'Select ONE sheet:',...
-        'Enter the sequence number for axis-X:',...
-        'Enter the sequence number for axis-Y:',...
-        'Enter the span of smoothing'};
+% [r c] = size(M); % r是行，c是列，行列尺寸；
+% R1 = M(2,:) % 显示第一行
+%-----弹框选择x&y-----
+prompt = {'Select ONE sheet:',...
+    'Enter the sequence number for axis-X:',...
+    'Enter the sequence numbers for axis-Y:',...
+    'Enter the span of smoothing'};
 %     dlg_title = 'Input';
-    dlg_title = 'Input';
-    num_lines = 1;
-    % num_lines 指定各用户输入值的行数。num_lines 可以为标量、列矢量或 m×2 数组。
-    defaultans = {'1','1','2','30'};%如果没有输入
-    % 'Voltage /V'指横坐标
-    
-    answer = inputdlg(prompt,dlg_title,num_lines,defaultans);% 接收X
-    n = str2num(answer{1});
-    X = str2num(answer{2}); % 这里的str2num没有问题，放心用
-    Y = str2num(answer{3});
-    SPAN = str2num(answer{4});
+dlg_title = 'Input';
+num_lines = 1;
+% num_lines 指定各用户输入值的行数。num_lines 可以为标量、列矢量或 m×2 数组。
+defaultans = {'1','1','2','30'};%如果没有输入
+% 'Voltage /V'指横坐标
+
+answer = inputdlg(prompt,dlg_title,num_lines,defaultans);% 接收X
+n = str2num(answer{1});
+X = str2num(answer{2}); % 这里的str2num没有问题，放心用
+Y = str2num(answer{3});
+SPAN = str2num(answer{4});
 % % Use curly bracket for subscript
 % [val status] = str2num(answer{1});
 % if ~status
@@ -45,13 +45,17 @@ function SeeInten_Frame
 % -----传参-----
 M = xlsread(fullfile(pathname, filename),sheet{n});
 x = M(:,X);
-y = M(:,Y);
-% plot(x,y);
-hold on
-yy1 = smooth(y,SPAN);%注意平滑程度
-plot(x,yy1); %绘制平滑后波形图
+iCount = 1; % 计数观察计算到达哪一步
+for jY = 1:length(Y)
+    y = M(:,Y(jY));
+    yy1 = smooth(y,SPAN);%注意平滑程度
+    plot(x,yy1); %绘制平滑后波形图
+    hold on
+%     legend(num2str(iCount));
+%     iCount = iCount + 1;
+end
+clear iCount
 xlabel('Frame');
 ylabel('Intensity');
-legend('平滑后波形');
-% legend('原始曲线','平滑后波形');
+legend(answer{3});
 hold off
