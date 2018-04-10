@@ -1,0 +1,80 @@
+% -----Information-----
+% For the sake of 'find0_9V.m',...
+% 为了下午的实验赶紧处理实验数据啊，少女！
+% Author: S201346044@mail.dlut.edu.cn, Still in USTC;
+% License: http://www.apache.org/licenses/;
+% Date: 2018/4/10
+
+function m20180403_Mn
+[filename, pathname] = ...
+    uigetfile({'*.xlsx';'*.xls';'*.*'},'File Selector');
+[~,sheet] = xlsfinfo(fullfile(pathname, filename));
+prompt = {'Select ONE sheet:',...
+    'Enter the sequence number for axis-X:',...
+    'Enter the sequence numbers for axis-Y:',...
+    'Enter the span of smoothing',...
+    'Name the sheet output:'};
+dlg_title = 'Input';
+num_lines = 1;
+defaultans = {'1','1','2','15','A1_'};%如果没有输入
+
+answer = inputdlg(prompt,dlg_title,num_lines,defaultans);% 接收X
+n = str2num(answer{1});
+X = str2num(answer{2}); % 这里的str2num没有问题，放心用
+Y = str2num(answer{3});
+SPAN = str2num(answer{4});
+reName = answer{5};
+
+if ~exist('Figure')
+    mkdir('Figure')         % 若不存在，在当前目录中产生一个子目录‘Figure’
+end
+INpath = 'Figure'; % 保存到当前文件夹
+
+[NUM, TXT] = xlsread(fullfile(pathname, filename),sheet{n});
+x = NUM(:,X);
+% allX = NUM(:,X);
+% x = allX(2:end);
+% mylgd = cell(1,length(Y));
+for jY = 1:length(Y)
+    y = NUM(:,Y(jY));
+%     fprintf(allY(1));
+%     y = allY(2:end);
+    f = figure; % 作图
+%     figure('visible','off') % 不显示图像
+    hold on
+    yy1 = smooth(y,SPAN); % 平滑y数据
+    % y2 = diff(y)./diff(x); % 求导原始数据y
+    % yy2 = smooth(y2,30); % 平滑y2数据
+    yy2 = diff(yy1)./diff(x); % 求导平滑数据yy1
+    yyy2 = smooth(yy2,SPAN); % 平滑yy2数据
+    
+%     yy1 = smooth(y,SPAN);%注意平滑程度
+%     plot(x,yy1); %绘制平滑后波形图
+%     hold on
+%     mylgd{jY} = ['NP', num2str(jY)];
+    
+    % -----激活左侧坐标轴-----
+    yyaxis left
+    plot(x,yy1); % 绘制平滑后波形图
+    ylabel('Intensity'); % 加左坐标轴标题
+    
+    % -----激活右侧坐标轴-----
+    yyaxis right
+    plot(x(2:end,1),yyy2);
+    ylabel('The differential derivative'); % 加右坐标轴标题
+    
+    % -----通用坐标轴信息添加-----
+    xlabel('Frame'); % 横坐标标题
+    legend('平滑后原始曲线','求导平滑后波形'); % 图例
+    hold off
+    
+    % -----结束该工作表的图表绘制-----
+    sName = TXT{Y(jY)};
+    INfilename = [reName sName '.fig'];
+    % 根据需求设置文件名
+    SavePath = fullfile(INpath, INfilename);
+    saveas(f,SavePath);
+    close(gcf)
+
+end
+% 最后下午不仅没做实验，还直接把统计力学课睡过去了。
