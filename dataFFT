@@ -1,0 +1,72 @@
+% -----Information-----
+% 对锰氧化物的数据做FFT，希望能够发现有些什么。
+% 本少女一点都不想复习分子光谱学，所以过来CtrlC+V；
+% Author: S201346044@mail.dlut.edu.cn, Still in USTC;
+% License: http://www.apache.org/licenses/;
+% 原来这个函数名叫m20180403_IV，本来还想搞个ifft过滤一下数据来着，
+% 但是啊，那天和钱晨师兄讨论完数据以后，就没必要搞这些了。丧到爆炸./
+% Date: 2018/4/13
+
+function dataFFT % 传参
+
+[filename, pathname] = ...
+    uigetfile({'*.xlsx';'*.xls';'*.*'},'File Selector');
+[~,sheet] = xlsfinfo(fullfile(pathname, filename));
+
+prompt = {'Select ONE sheet:',...
+    'Enter the sequence number for FFT:',...
+    'Enter the sampling frequency of signal:',...
+    'Enter the length of signal:',...
+    'Name the sheet output:'};
+%     dlg_title = 'Input';
+dlg_title = 'Input';
+num_lines = 1;
+% num_lines 指定各用户输入值的行数。num_lines 可以为标量、列矢量或 m×2 数组。
+defaultans = {'1','1','106','1272','FFT_'}; % 如果没有输入
+% 'Voltage /V'指横坐标
+
+answer = inputdlg(prompt,dlg_title,num_lines,defaultans); % 接收X
+n = str2num(answer{1});
+x = str2num(answer{2}); % 这里的str2num没有问题，放心用
+Fs = str2num(answer{3});
+L = str2num(answer{4});
+reName = answer{5};
+
+% Fs = 106;       % Sampling frequency
+% T = 1/Fs;       % Sampling period
+% L = 1272;       % Length of signal
+% t = (0:L - 1);  % Time vector
+
+
+if ~exist('Figure')
+    mkdir('Figure')         % 若不存在，在当前目录中产生一个子目录‘Figure’
+end
+INpath = 'Figure'; % 保存到当前文件夹
+
+
+[NUM, TXT] = xlsread(fullfile(pathname, filename),sheet{n});
+
+for iX = 1:length(x)
+    y = NUM(:,x(iX));
+    Y = fft(y); % 计算信号的傅里叶变换
+    % Compute the two-sided spectrum P2. Then compute the single-sided
+    % spectrum P1 based on P2 and the even-valued signal length L./
+    P2 = abs(Y/L);
+    P1 = P2(1:L/2+1);
+    P1(2:end-1) = 2*P1(2:end-1);
+    
+    f = Fs*(0:(L/2))/L;
+    fig = figure; % 作图
+    plot(f,P1);
+    sName = TXT{x(iX)};
+    title(['Single-Sided Amplitude Spectrum of ' sName]);
+    xlabel('f (Hz)');
+    ylabel('|P1(f)|');
+    
+    % -----结束该工作表的图表绘制-----
+    INfilename = [reName sName '.fig'];
+    % 根据需求设置文件名
+    SavePath = fullfile(INpath, INfilename);
+    saveas(fig,SavePath);
+    close(gcf)
+end
