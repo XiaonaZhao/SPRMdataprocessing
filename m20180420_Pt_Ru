@@ -1,0 +1,51 @@
+function m20180420_Pt_Ru
+% 弹框获取文件名和地址
+[filename, pathname] = ...
+    uigetfile({'*.xlsx';'*.xls';'*.*'},'File Selector');
+[~,sheet] = xlsfinfo(fullfile(pathname, filename));
+% for i = 1:length(sheet) % 读取不同工作表的内容
+%     sheet_n = sheet{i};
+% 读取文件，注意fullfile
+
+% [r c] = size(M); % r是行，c是列，行列尺寸；
+% R1 = M(2,:) % 显示第一行
+%-----弹框选择x&y-----
+prompt = {'Select ONE sheet:',...
+    'Enter the sequence number for axis-X:',...
+    'Enter the sequence numbers for axis-Y:',...
+    'Enter the span of smoothing'};
+%     dlg_title = 'Input';
+dlg_title = 'Input';
+num_lines = 1;
+% num_lines 指定各用户输入值的行数。num_lines 可以为标量、列矢量或 m×2 数组。
+defaultans = {'1','1','2','3'};%如果没有输入
+% 'Voltage /V'指横坐标
+
+answer = inputdlg(prompt,dlg_title,num_lines,defaultans);% 接收X
+n = str2num(answer{1});
+X = str2num(answer{2}); % 这里的str2num没有问题，放心用
+Y = str2num(answer{3});
+SPAN = str2num(answer{4});
+
+% -----传参-----
+[NUM, TXT] = xlsread(fullfile(pathname, filename),sheet{n});
+x = NUM(:,X);
+
+for jY = 1:length(Y)
+    y = NUM(:,Y(jY));
+    yy1 = smooth(y,SPAN);%注意平滑程度
+    plot(x,yy1); %绘制平滑后波形图
+    hold on
+end
+% 不建议把legend放在循环中更新，这样开销会比较大效率会比较差，建议放在循环结束后一起添加legend
+% 集中设置图例，这里使用胞元数组传参
+cellLEGEND = cell(1,length(Y));
+for jCell = 1:length(Y)
+    cellLEGEND(jCell) = TXT(1,Y(jCell));
+end
+legend(cellLEGEND); 
+
+xlabel('Voltage/V'); % 横坐标已经提前转化为电压
+ylabel('Intensity/a.u.'); % 纵坐标是强度的绝对值
+
+hold off
