@@ -1,3 +1,8 @@
+% -----Information-----
+% Author: S201346044@mail.dlut.edu.cn;
+% License: http://www.apache.org/licenses/;
+
+
 function m20180420_Pt_Ru
 % 弹框获取文件名和地址
 [filename, pathname] = ...
@@ -18,7 +23,7 @@ prompt = {'Select ONE sheet:',...
 dlg_title = 'Input';
 num_lines = 1;
 % num_lines 指定各用户输入值的行数。num_lines 可以为标量、列矢量或 m×2 数组。
-defaultans = {'1','1','2','3'};%如果没有输入
+defaultans = {'9','4','2 3','7'};%如果没有输入
 % 'Voltage /V'指横坐标
 
 answer = inputdlg(prompt,dlg_title,num_lines,defaultans);% 接收X
@@ -33,6 +38,8 @@ x = NUM(:,X);
 
 for jY = 1:length(Y)
     y = NUM(:,Y(jY));
+%     dy = diff(y); % diff -> current density
+%     plot(x(1:length(dy),1),smooth(dy,SPAN)); %绘制平滑后波形图
     yy1 = smooth(y,SPAN);%注意平滑程度
     plot(x,yy1); %绘制平滑后波形图
     hold on
@@ -43,7 +50,8 @@ cellLEGEND = cell(1,length(Y));
 for jCell = 1:length(Y)
     cellLEGEND(jCell) = TXT(1,Y(jCell));
 end
-legend(cellLEGEND); 
+axis([-0.3 -0.1,-inf,inf]);% 设置二维图的x-y坐标范围
+legend(cellLEGEND, 'Location','northwest'); % set the location of legend
 
 xlabel('Voltage/V'); % 横坐标已经提前转化为电压
 ylabel('Intensity/a.u.'); % 纵坐标是强度的绝对值
